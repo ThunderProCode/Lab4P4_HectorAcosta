@@ -27,7 +27,9 @@ public class Main {
         NormalVillager normalito1 = new NormalVillager("Bellaco","Montesco",20,200);
         PacifistVillager pacifista1 = new PacifistVillager("Josue","Montesco",19,300);
         BlacksmithVillager herrero1 = new BlacksmithVillager("Michael","Montesco",20,500);
+        SuperVillager Romeo = new SuperVillager("Romeo","Montesco",20,1000);
         
+        montesco.addVillager(Romeo);
         montesco.addVillager(herrero1);
         montesco.addVillager(pacifista1);
         montesco.addVillager(normalito1);
@@ -60,6 +62,7 @@ public class Main {
                     break;
                 case 4:
                     play();
+                    print("Ejecutado en consola");
                     break;
                 case 5:
                     print("Programa Finalizado");
@@ -112,7 +115,7 @@ public class Main {
             Family montesco = getFamilyByLastName("Montesco");
             while(families.size()>1){
                 
-                String lastName = JOptionPane.showInputDialog("--Familias--\n"+familiesNames() + "\nIngrese la familia que va a pelear contra los Montesco: ");
+                String lastName = JOptionPane.showInputDialog("--Familias--\n"+familiesNames() + "\nIngrese la siguiente familia que va a pelear contra los Montesco: ");
                 if(lastNameExists(lastName)){
                     Family locales = getFamilyByLastName("Montesco");
                     Family luchadora = getFamilyByLastName(lastName);
@@ -120,17 +123,23 @@ public class Main {
 
                     for (Villager fighter1 : locales.getVillagers()) {
                         for (Villager fighter2 : luchadora.getVillagers()) {
-                            fight(fighter1,fighter2);
+                            if(fighter1.alive && fighter2.alive){
+                                fight(fighter1,fighter2);
+                            }
                         }
                     }
 
-                    if(locales.getVillagers().size() > luchadora.getVillagers().size()){
-                        System.out.println( "Los " + locales.getLastName() + " vencieron a " + luchadora.getLastName());
-                        families.remove(luchadora);
-                    }else{
+                    if(aliveCount(locales) == 0){
                         System.out.println( "Los " + luchadora.getLastName() + " vencieron a " + locales.getLastName());
                         families.remove(locales);
+                    }else if(aliveCount(luchadora)==0){
+                        System.out.println( "Los " + locales.getLastName() + " vencieron a " + luchadora.getLastName());
+                        families.remove(luchadora);
                     }
+                }
+                
+                if(!families.contains(montesco)){
+                    break;
                 }
             }
             
@@ -139,23 +148,32 @@ public class Main {
             }else{
                 System.out.println("Romeo no se quedo con Julieta, su familia fue eliminada");
             }
-            
     }
     
+    
+    public static  int aliveCount(Family family){
+        int c=0;
+        for (Villager villager : family.getVillagers()) {
+            if(villager.alive){
+                c++;
+            }
+        }
+        return c;
+    }
     
     public static void fight(Villager fighter1,Villager fighter2){
         while(fighter1.getHp() >0 && fighter2.getHp() > 0 ){
             fighter1.attack(fighter2);
-            fighter2.attack(fighter2);
+            fighter2.attack(fighter1);
         }
         if(fighter1.getHp() > fighter2.getHp()){
             System.out.println( fighter2.getName() + " ha sido eliminado");
             String lastName = fighter2.getLastName();
-            getFamilyByLastName(lastName).getVillagers().remove(fighter2);
+            fighter2.alive = false;
         }else{
             System.out.println( fighter1.getName() + " ha sido eliminado");
             String lastName = fighter1.getLastName();
-            getFamilyByLastName(lastName).getVillagers().remove(fighter1);
+            fighter1.alive = false;
         }
     }
     
@@ -163,7 +181,9 @@ public class Main {
     public static String familiesNames(){
         String familiesNames = "";
         for (Family family : families) {
-            familiesNames += family.getLastName() + "\n";
+            if(!family.getLastName().equals("Montesco")){
+                familiesNames += family.getLastName() + "\n";
+            }
         }
         return familiesNames;
     }

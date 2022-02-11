@@ -7,14 +7,22 @@ public class Villager {
     private int age;
     public int hp;
     public int damage;
-
+    public boolean alive = true;
+    
     public Villager(String name, String lastName, int age, int hp) {
         this.name = name;
         this.lastName = lastName;
         this.age = age;
         this.hp = hp;
     }
-    
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
     
     /**
      * Get the value of damage
